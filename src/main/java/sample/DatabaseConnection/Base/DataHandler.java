@@ -4,7 +4,7 @@ import sample.Register;
 
 import java.sql.*;
 
-public class DataHandler {
+public class DataHandler <T>{
     String connectionURL = "jdbc:mysql://localhost:3306/StockHome";
     String user = "root";
     String pwd = "neptune05";
@@ -32,15 +32,22 @@ public class DataHandler {
         }
     }
 
-    ResultSet executeQuery(String query){
+    public void executeQuery(String query, T obj, dbFunction<T> function){
         try(Connection conn = DriverManager.getConnection(connectionURL,user,pwd);
             PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery()){
-            return rs;
+                function.execute(rs,obj);
         }
         catch (SQLException e){
             e.printStackTrace();
         }
-        return null;
+    }
+
+    public void executeUpdate(String update) throws SQLException {
+        try(Connection conn = DriverManager.getConnection(connectionURL,user,pwd);
+            Statement statement = conn.createStatement();
+            ){
+            statement.executeUpdate(update);
+        }
     }
 }

@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import sample.DatabaseConnection.Base.DataProcess;
 
 public class Main extends Application {
 
@@ -14,6 +15,7 @@ public class Main extends Application {
         primaryStage.setTitle("StockHome login");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
+
     }
 
 

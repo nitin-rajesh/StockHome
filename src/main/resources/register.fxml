@@ -11,9 +11,13 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-
 <AnchorPane prefHeight="240.0" prefWidth="380.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Register">
    <children>
+      <Text fx:id="infoText" layoutX="47.0" layoutY="212.0" strokeType="OUTSIDE" strokeWidth="0.0" text="                              ">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </Text>
       <Text layoutX="92.0" layoutY="37.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Create new account">
          <font>
             <Font name="DIN Alternate Bold" size="24.0" />
@@ -31,21 +35,22 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <TextField prefHeight="26.0" prefWidth="206.0" GridPane.columnIndex="1" />
+            <TextField fx:id="userName" prefHeight="26.0" prefWidth="206.0" GridPane.columnIndex="1" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Username" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Password" GridPane.rowIndex="2" />
             <TextField prefHeight="26.0" prefWidth="206.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <TextField prefHeight="26.0" prefWidth="206.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="emailID" prefHeight="26.0" prefWidth="206.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Email ID" GridPane.rowIndex="1" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Confirm password" wrappingWidth="87.57568359375" GridPane.rowIndex="3" />
             <TextField prefHeight="26.0" prefWidth="206.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <PasswordField GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <PasswordField GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <PasswordField fx:id="confirmPassword" GridPane.columnIndex="1" GridPane.rowIndex="3" />
          </children>
       </GridPane>
       <ButtonBar layoutY="200.0" prefHeight="40.0" prefWidth="374.0">
         <buttons>
-          <Button minWidth="51.0" mnemonicParsing="false" prefHeight="26.0" text="Button" />
+            <Button minWidth="42.0" mnemonicParsing="false" onAction="#goBack" prefHeight="26.0" text="Back" />
+          <Button minWidth="51.0" mnemonicParsing="false" onAction="#createAccount" prefHeight="26.0" text="Create" />
         </buttons>
       </ButtonBar>
    </children>

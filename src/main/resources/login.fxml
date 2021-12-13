@@ -27,8 +27,8 @@
                   <Font name="DIN Alternate Bold" size="48.0" />
                </font>
             </Text>
-            <ComboBox fx:id="UserNameBox" editable="true" layoutX="149.0" layoutY="116.0" prefWidth="150.0" AnchorPane.bottomAnchor="116.0" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="81.0" AnchorPane.topAnchor="116.0" />
-            <Text layoutX="78.0" layoutY="134.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username" AnchorPane.bottomAnchor="121.2578125" AnchorPane.leftAnchor="78.0" AnchorPane.rightAnchor="245.759765625" AnchorPane.topAnchor="121.2421875" />
+            <ComboBox fx:id="userNameBox" editable="true" layoutX="149.0" layoutY="116.0" prefWidth="150.0" AnchorPane.bottomAnchor="116.0" AnchorPane.leftAnchor="149.0" AnchorPane.rightAnchor="81.0" AnchorPane.topAnchor="116.0" />
+            <Text layoutX="78.0" layoutY="134.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Email ID" AnchorPane.bottomAnchor="121.2578125" AnchorPane.leftAnchor="78.0" AnchorPane.rightAnchor="245.759765625" AnchorPane.topAnchor="121.2421875" />
             <Text layoutX="79.0" layoutY="177.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Password" AnchorPane.bottomAnchor="79.0" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="247.4638671875" AnchorPane.topAnchor="164.0" />
             <ButtonBar layoutX="5.0" layoutY="220.0" prefHeight="40.0" prefWidth="370.0">
               <buttons>
