@@ -35,12 +35,17 @@ public class Register {
     Text infoText;
 
     @FXML
-    void createAccount(ActionEvent e) throws SQLException {
+    void createAccount(ActionEvent e) throws SQLException, IOException {
         User user = new User(emailID.getText(), userName.getText(), passwordField.getText());
         if(!passwordField.getText().equals(confirmPassword.getText()))
             infoText.setText("Passwords not matching");
         else
             DataProcess.addUser(user);
+        stage = (Stage) ((Node)e.getSource()).getScene().getWindow();
+        Parent root = FXMLLoader.load(getClass().getResource("/home_screen.fxml"));
+        stage.setTitle("StockHome - " + user.name());
+        stage.setScene(new Scene(root));
+        stage.show();
     }
 
     @FXML

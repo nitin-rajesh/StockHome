@@ -2,13 +2,13 @@ package sample.DatabaseConnection.Base;
 
 import sample.Register;
 
+import java.io.IOException;
 import java.sql.*;
 
 public class DataHandler <T>{
     String connectionURL = "jdbc:mysql://localhost:3306/StockHome";
     String user = "root";
     String pwd = "neptune05";
-
     public DataHandler(){
         //ctor
     }
@@ -38,7 +38,7 @@ public class DataHandler <T>{
             ResultSet rs = ps.executeQuery()){
                 function.execute(rs,obj);
         }
-        catch (SQLException e){
+        catch (SQLException | IOException e){
             e.printStackTrace();
         }
     }

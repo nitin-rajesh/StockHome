@@ -50,7 +50,7 @@
       <ButtonBar layoutY="200.0" prefHeight="40.0" prefWidth="374.0">
         <buttons>
             <Button minWidth="42.0" mnemonicParsing="false" onAction="#goBack" prefHeight="26.0" text="Back" />
-          <Button minWidth="51.0" mnemonicParsing="false" onAction="#createAccount" prefHeight="26.0" text="Create" />
+          <Button defaultButton="true" minWidth="51.0" mnemonicParsing="false" onAction="#createAccount" prefHeight="26.0" text="Create" />
         </buttons>
       </ButtonBar>
    </children>

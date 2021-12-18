@@ -9,15 +9,22 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import sample.DatabaseConnection.Base.DataHandler;
 import sample.DatabaseConnection.Base.DataProcess;
+import sample.DatabaseConnection.PrefStack.PrefSettings;
+import sample.DatabaseConnection.PrefStack.PrefWriter;
+import sample.DatabaseConnection.Records.User;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 public class Controller implements Initializable {
 
@@ -30,23 +37,41 @@ public class Controller implements Initializable {
     PasswordField passwordField;
 
     @FXML
+    Text infoText;
+
+    @FXML
     void loginButton(ActionEvent e) throws SQLException {
-        try{
+        /*try{
             System.out.println(DataProcess.getStockPrice("GOOGL"));
         } catch (IOException ex){
             ex.printStackTrace();
-        }
-        /*DataHandler dataHandler = new DataHandler();
-        dataHandler.testConnection();
-        dataHandler.executeQuery("SELECT * FROM Company WHERE Market_cap > 1000000000000.00",(resultSet)->{
-            while(resultSet.next())
-            System.out.println(resultSet.getString("Name"));
-        });*/
+        }*/
+        DataHandler<ActionEvent> dataHandler = new DataHandler<>();
+        String query = "SELECT * FROM User WHERE email_ID = '" + userNameBox.getValue() + "';";
+        dataHandler.executeQuery(query,e,(resultSet, actionEvent)->{
+            while(resultSet.next()){
+                if(passwordField.getText().equals(resultSet.getString("Password"))){
+                    stage = (Stage) ((Node)actionEvent.getSource()).getScene().getWindow();
+                    User user = new User(resultSet.getString("Email_ID"),resultSet.getString("Username"),resultSet.getString("Password"));
+                    PrefSettings p = new PrefWriter();
+                    p.writeValues(user.name(),user.emailID(),user.password());
+                    try{
+                        Parent root = FXMLLoader.load(getClass().getResource("/home_screen.fxml"));
+                        stage.setTitle("StockHome - " + resultSet.getString("Username"));
+                        stage.setScene(new Scene(root));
+                        stage.show();
+                    }catch (IOException ignored){}
+                }
+                else{
+                    infoText.setText("Check username or password");
+                }
+            }
+
+        });
     }
 
     @FXML
     void registerButton(ActionEvent e) throws IOException {
-        String username = userNameBox.getValue();
         stage = (Stage) ((Node)e.getSource()).getScene().getWindow();
         Parent root = FXMLLoader.load(getClass().getResource("/register.fxml"));
         stage.setTitle("Create new account");
@@ -68,5 +93,6 @@ public class Controller implements Initializable {
                 userNameBox.getItems().add(email);
             }
         });
+
     }
 }

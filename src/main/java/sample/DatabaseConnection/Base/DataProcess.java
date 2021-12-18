@@ -22,11 +22,11 @@ public class DataProcess {
         dataHandler.executeUpdate(fullquery);
     }
 
-    public static double getStockPrice(String symbol) throws IOException {
+    public static double getStockPrice(String symbol) throws IOException, InterruptedException {
         Runtime rt = Runtime.getRuntime();
-        String[] commands = {"python3", "stock_scraper.py","AAPL"};
+        String[] commands = {"python3", "stock_scraper.py",symbol};
         Process proc = rt.exec(commands);
-
+        proc.waitFor();
         BufferedReader stdInput = new BufferedReader(new
                 InputStreamReader(proc.getInputStream()));
 
@@ -48,6 +48,7 @@ public class DataProcess {
         while ((s = stdError.readLine()) != null) {
             System.out.println(s);
         }
+
 
         return stockPrice;
     }
