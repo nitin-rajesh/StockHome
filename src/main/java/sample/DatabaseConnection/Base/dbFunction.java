@@ -9,5 +9,5 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public interface dbFunction <T>{
-    public void execute(ResultSet rs, T obj) throws SQLException, IOException;
+    public void execute(ResultSet rs, T obj) throws SQLException, IOException, InterruptedException;
 }

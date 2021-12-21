@@ -3,8 +3,6 @@ package sample.DatabaseConnection.Base;
 import javafx.scene.control.ComboBox;
 import sample.DatabaseConnection.Base.DataHandler;
 import sample.DatabaseConnection.Records.*;
-import yahoofinance.Stock;
-import yahoofinance.YahooFinance;
 
 
 import java.io.BufferedReader;

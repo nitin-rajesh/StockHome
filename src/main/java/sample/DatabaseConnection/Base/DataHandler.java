@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.sql.*;
 
 public class DataHandler <T>{
-    String connectionURL = "jdbc:mysql://localhost:3306/StockHome";
-    String user = "root";
+    String connectionURL = "jdbc:mysql://192.168.0.118:3306/StockHome";
+    String user = "guest";
     String pwd = "neptune05";
     public DataHandler(){
         //ctor
@@ -38,7 +38,7 @@ public class DataHandler <T>{
             ResultSet rs = ps.executeQuery()){
                 function.execute(rs,obj);
         }
-        catch (SQLException | IOException e){
+        catch (SQLException | IOException | InterruptedException e){
             e.printStackTrace();
         }
     }

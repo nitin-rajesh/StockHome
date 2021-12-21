@@ -4,7 +4,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -16,12 +15,12 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import sample.DatabaseConnection.Base.DataHandler;
 import sample.DatabaseConnection.Base.DataProcess;
+import sample.DatabaseConnection.Mongo.MongoHandler;
 import sample.DatabaseConnection.PrefStack.PrefReader;
 import sample.DatabaseConnection.PrefStack.PrefSettings;
 import sample.DatabaseConnection.PrefStack.PrefWriter;
 import sample.DatabaseConnection.Records.User;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -29,6 +28,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HomeScreen implements Initializable {
 
@@ -37,6 +37,8 @@ public class HomeScreen implements Initializable {
     ArrayList<Text> textRepo = new ArrayList<>();
     ArrayList<Button> buttonRepo = new ArrayList<>();
     ArrayList<Integer> transactionIDs = new ArrayList<>();
+
+    MongoHandler mongoHandler;
 
     Stage stage;
 
@@ -116,6 +118,11 @@ public class HomeScreen implements Initializable {
     }
 
     @FXML
+    void showRecommendations(ActionEvent e){
+
+    }
+
+    @FXML
     void showTransactions(ActionEvent e){
         focus = FocusModes.TRANSACTION;
         DataHandler<String> dataHandler = new DataHandler<>();
@@ -123,6 +130,7 @@ public class HomeScreen implements Initializable {
         frontView.getItems().clear();
         dataHandler.executeQuery(query, query, (rc, ignored)->{
             while(rc.next()){
+                AtomicBoolean toSell = new AtomicBoolean(false);
                 HBox temp = new HBox();
                 Integer tID = rc.getInt("Transaction_ID");
                 Text coPrice = new Text(new DecimalFormat("#.##").format(rc.getDouble("Price")));
@@ -150,10 +158,12 @@ public class HomeScreen implements Initializable {
                         if(roiVal > 0){
                             opString = "+" + opString;
                             ROI.setFill(Color.GREEN);
+                            toSell.set(true);
                         }
                         else{
                             opString = "-" + opString;
                             ROI.setFill(Color.RED);
+                            toSell.set(false);
                         }
                         ROI.setText(opString);
 
@@ -185,6 +195,7 @@ public class HomeScreen implements Initializable {
 
                 if(rc.getString("Buy_or_sell").equals("b")){
                     temp.getChildren().add(sellButton);
+                    mongoHandler.addRec(rc.getString("Txn_TradeName"),user.emailID(),ROI.getText(), toSell.get());
                 }
                 else{
                     Text soldText = new Text("Sold");
@@ -336,5 +347,6 @@ public class HomeScreen implements Initializable {
         //System.out.println(user.toString());
         showTransactions(new ActionEvent());
         focus = FocusModes.TRANSACTION;
+        mongoHandler = new MongoHandler();
     }
 }

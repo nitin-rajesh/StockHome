@@ -36,6 +36,7 @@
             <items>
                   <MenuItem mnemonicParsing="false" onAction="#showTransactions" text="Transactions" />
                   <MenuItem mnemonicParsing="false" onAction="#showGroups" text="Groups" />
+                  <MenuItem mnemonicParsing="false" onAction="#showRecommendations" text="Recommendations" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Groups">

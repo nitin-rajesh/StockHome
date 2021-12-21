@@ -11,6 +11,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import sample.DatabaseConnection.Base.DataProcess;
+import sample.DatabaseConnection.PrefStack.PrefSettings;
+import sample.DatabaseConnection.PrefStack.PrefWriter;
 import sample.DatabaseConnection.Records.User;
 
 import java.io.IOException;
@@ -43,6 +45,8 @@ public class Register {
             DataProcess.addUser(user);
         stage = (Stage) ((Node)e.getSource()).getScene().getWindow();
         Parent root = FXMLLoader.load(getClass().getResource("/home_screen.fxml"));
+        PrefSettings p = new PrefWriter();
+        p.writeValues(user.name(),user.emailID(),user.password());
         stage.setTitle("StockHome - " + user.name());
         stage.setScene(new Scene(root));
         stage.show();
