@@ -1,7 +1,7 @@
 package sample;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
 import javafx.application.Application;
@@ -20,27 +20,7 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
 
-        //Creating a Mongo client
-        MongoClient mongo = MongoClients.create( "mongodb://192.168.0.118:27017" );
-        //Connecting to the database
-        MongoDatabase database = mongo.getDatabase("test");
-        //Creating multiple collections
-        database.createCollection("sampleCollection1");
-        database.createCollection("sampleCollection2");
-        database.createCollection("sampleCollection3");
-        database.createCollection("sampleCollection4");
-        //Retrieving the list of collections
-        MongoIterable<String> list = database.listCollectionNames();
-        System.out.println("List of collections:");
-        for (String name : list) {
-            System.out.println(name);
-        }
-        database.getCollection("sampleCollection4").drop();
-        System.out.println("Collection dropped successfully");
-        System.out.println("List of collections after the delete operation:");
-        for (String name : list) {
-            System.out.println(name);
-        }
+
 
     }
 

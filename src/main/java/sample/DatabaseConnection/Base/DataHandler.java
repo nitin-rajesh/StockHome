@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.sql.*;
 
 public class DataHandler <T>{
-    String connectionURL = "jdbc:mysql://192.168.0.118:3306/StockHome";
+    String connectionURL = "jdbc:mysql://localhost:3306/StockHome";
     String user = "guest";
     String pwd = "neptune05";
     public DataHandler(){

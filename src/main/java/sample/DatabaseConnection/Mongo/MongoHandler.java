@@ -1,5 +1,6 @@
 package sample.DatabaseConnection.Mongo;
 
+import com.mongodb.MongoClient;
 import com.mongodb.client.*;
 import org.bson.Document;
 import sample.DatabaseConnection.Base.DataProcess;
@@ -12,7 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class MongoHandler {
-    MongoClient client = MongoClients.create("mongodb://192.168.0.118:27017");
+    MongoClient client = new MongoClient("192.168.0.118",27017);
     MongoDatabase database;
     MongoCollection<Document> buyableCollection;
     MongoCollection<Document> sellableCollection;

@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import sample.DatabaseConnection.Base.DataHandler;
 import sample.DatabaseConnection.Base.DataProcess;
 import sample.DatabaseConnection.Mongo.MongoHandler;
+import sample.DatabaseConnection.Mongo.MongoProcess;
 import sample.DatabaseConnection.PrefStack.PrefReader;
 import sample.DatabaseConnection.PrefStack.PrefSettings;
 import sample.DatabaseConnection.PrefStack.PrefWriter;
@@ -118,8 +119,66 @@ public class HomeScreen implements Initializable {
     }
 
     @FXML
-    void showRecommendations(ActionEvent e){
+    void showRecommendations(ActionEvent e) throws IOException, InterruptedException {
+        ArrayList<String> symbols = MongoProcess.readFromDB("recommendation");
+        DataProcess.mongoRefresh();
+        System.out.println(symbols.stream().toArray().toString());
+        Integer search = 0;
+        frontView.getItems().clear();
+        for(String sym: symbols){
+        String query = "Select * from Company where Trade_name='" + sym +"';";
+        DataHandler<Integer> dataHandler = new DataHandler<>();
 
+        dataHandler.executeQuery(query, search,(rc, count)->{
+            while(rc.next() && count < 20){
+                count++;
+                HBox temp = new HBox();
+                temp.setSpacing(20);
+                Text coName = new Text(rc.getString("Name"));
+                System.out.println(coName.getText());
+                Text coSymbol = new Text(rc.getString("Trade_name"));
+                Text coPrice = new Text("...");
+                TextField quantity = new TextField();
+                Button buyButton = new Button("Buy");
+                textRepo.add(coName);
+                textRepo.add(coPrice);
+                textRepo.add(coSymbol);
+                buttonRepo.add(buyButton);
+                new Thread(()->{
+                    try {
+                        double marketPrice = DataProcess.getStockPrice(coSymbol.getText());
+                        coPrice.setText(new DecimalFormat("#.##").format(marketPrice));
+
+                    } catch (IOException | InterruptedException ioException) {
+                        ioException.printStackTrace();
+                    }
+                }).start();
+                buyButton.setOnAction(actionEvent -> {
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Transaction alert");
+                    alert.setContentText("Are you sure you want to proceed?");
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if(result.get() == ButtonType.OK) {
+                        String q = "INSERT INTO TRANSACTION(Price,Quantity,Txn_TradeName,Txn_UserID,Buy_or_sell) VALUES"
+                                + "(" + Double.parseDouble(coPrice.getText()) + ", " + Integer.parseInt(quantity.getText())
+                                + ", '" + coSymbol.getText() + "', '" + user.emailID() + "', 'b');";
+                        System.out.println(q);
+                        try {
+                            new DataHandler<String>().executeUpdate(q);
+                        } catch (SQLException throwables) {
+                            throwables.printStackTrace();
+                        }
+                        alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Transaction");
+                        alert.setContentText("Transaction complete");
+                        alert.show();
+                    }
+                });
+                temp.getChildren().addAll(coSymbol,coName,coPrice,quantity,buyButton);
+                frontView.getItems().add(0,temp);
+            }
+        });
+        }
     }
 
     @FXML
@@ -156,6 +215,8 @@ public class HomeScreen implements Initializable {
                         double roiVal = 100*(marketPrice - Double.parseDouble(coPrice.getText()))/Double.parseDouble(coPrice.getText());
                         String opString = new DecimalFormat("#.##").format(roiVal) + "%";
                         if(roiVal > 0){
+                            //DataProcess.mongoEntry(coName.getText());
+                            MongoProcess.writeToDB(coName.getText());
                             opString = "+" + opString;
                             ROI.setFill(Color.GREEN);
                             toSell.set(true);
@@ -195,7 +256,7 @@ public class HomeScreen implements Initializable {
 
                 if(rc.getString("Buy_or_sell").equals("b")){
                     temp.getChildren().add(sellButton);
-                    mongoHandler.addRec(rc.getString("Txn_TradeName"),user.emailID(),ROI.getText(), toSell.get());
+                    //mongoHandler.addRec(rc.getString("Txn_TradeName"),user.emailID(),ROI.getText(), toSell.get());
                 }
                 else{
                     Text soldText = new Text("Sold");
@@ -347,6 +408,5 @@ public class HomeScreen implements Initializable {
         //System.out.println(user.toString());
         showTransactions(new ActionEvent());
         focus = FocusModes.TRANSACTION;
-        mongoHandler = new MongoHandler();
     }
 }
