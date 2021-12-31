@@ -46,7 +46,7 @@ public class Register {
         stage = (Stage) ((Node)e.getSource()).getScene().getWindow();
         Parent root = FXMLLoader.load(getClass().getResource("/home_screen.fxml"));
         PrefSettings p = new PrefWriter();
-        p.writeValues(user.name(),user.emailID(),user.password());
+        p.writeValues(user.emailID(),user.name(),user.password());
         stage.setTitle("StockHome - " + user.name());
         stage.setScene(new Scene(root));
         stage.show();

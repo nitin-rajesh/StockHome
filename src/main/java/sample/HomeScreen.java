@@ -59,6 +59,8 @@ public class HomeScreen implements Initializable {
 
     @FXML
     void searchStock(ActionEvent event){
+        long startTime = System.nanoTime();
+
         focus = FocusModes.SEARCH;
         Integer search = 0;
         System.out.println("Here");
@@ -67,7 +69,7 @@ public class HomeScreen implements Initializable {
         DataHandler<Integer> dataHandler = new DataHandler<>();
         frontView.getItems().clear();
         dataHandler.executeQuery(query, search,(rc, count)->{
-            while(rc.next() && count < 20){
+            while(rc.next() && count < 80){
                 count++;
                 HBox temp = new HBox();
                 temp.setSpacing(20);
@@ -82,6 +84,8 @@ public class HomeScreen implements Initializable {
                 textRepo.add(coSymbol);
                 buttonRepo.add(buyButton);
                 new Thread(()->{
+                    long sTime = System.nanoTime();
+
                     try {
                         double marketPrice = DataProcess.getStockPrice(coSymbol.getText());
                         coPrice.setText(new DecimalFormat("#.##").format(marketPrice));
@@ -89,6 +93,10 @@ public class HomeScreen implements Initializable {
                     } catch (IOException | InterruptedException ioException) {
                         ioException.printStackTrace();
                     }
+
+                    long eTime = System.nanoTime();
+                    double ttsort = ((eTime - sTime)/1000000.0);
+                    System.out.println("Price thread: " + ttsort + "ms");
                 }).start();
                 buyButton.setOnAction(actionEvent -> {
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -115,11 +123,17 @@ public class HomeScreen implements Initializable {
                 frontView.getItems().add(0,temp);
             }
         });
+        long endTime = System.nanoTime();
+        double timeToSort = ((endTime - startTime)/1000.0);
+        System.out.println("Show recommendations: " + timeToSort + "µs");
 
     }
 
     @FXML
     void showRecommendations(ActionEvent e) throws IOException, InterruptedException {
+        long startTime = System.nanoTime();
+
+
         ArrayList<String> symbols = MongoProcess.readFromDB("recommendation");
         DataProcess.mongoRefresh();
         System.out.println(symbols.stream().toArray().toString());
@@ -179,10 +193,16 @@ public class HomeScreen implements Initializable {
             }
         });
         }
+        long endTime = System.nanoTime();
+        double timeToSort = ((endTime - startTime)/1000.0);
+        System.out.println("Show recommendations: " + timeToSort + "µs");
+
     }
 
     @FXML
     void showTransactions(ActionEvent e){
+        long startTime = System.nanoTime();
+
         focus = FocusModes.TRANSACTION;
         DataHandler<String> dataHandler = new DataHandler<>();
         String query = "SELECT * FROM Transaction WHERE Txn_userID = '" + user.emailID() + "';";
@@ -267,6 +287,11 @@ public class HomeScreen implements Initializable {
                 frontView.getItems().add(0,temp);
             }
         });
+
+        long endTime = System.nanoTime();
+        double timeToSort = ((endTime - startTime)/1000.0);
+        System.out.println("Show transactions: " + timeToSort + "µs");
+
     }
 
     @FXML
@@ -276,6 +301,8 @@ public class HomeScreen implements Initializable {
 
     @FXML
     void showGroups(ActionEvent e){
+        long startTime = System.nanoTime();
+
         focus = FocusModes.GROUP;
         DataHandler<String> dataHandler = new DataHandler<>();
         String query = "SELECT * FROM StockGroup WHERE Group_userID = '" + user.emailID() + "';";
@@ -330,19 +357,32 @@ public class HomeScreen implements Initializable {
             }
         });
 
+        long endTime = System.nanoTime();
+        double timeToSort = ((endTime - startTime)/1000.0);
+        System.out.println("Show groups: " + timeToSort + "µs");
+
 
     }
 
     @FXML
     void addGroup(ActionEvent e) throws IOException {
+        long startTime = System.nanoTime();
+
         Stage popStage = new Stage();
         Parent root = FXMLLoader.load(getClass().getResource("/dialogue_box.fxml"));
         popStage.setTitle("Create group");
         popStage.setScene(new Scene(root));
         popStage.show();
+
+        long endTime = System.nanoTime();
+        double timeToSort = ((endTime - startTime)/1000.0);
+        System.out.println("Add group: " + timeToSort + "µs");
+
     }
     @FXML
     void addCompanyToGroup(ActionEvent e) throws SQLException, IOException {
+        long startTime = System.nanoTime();
+
         if(focus != FocusModes.GROUP){
             HBox selection = frontView.getSelectionModel().getSelectedItems().get(0);
             Text obj = (Text)selection.getChildren().get(0);
@@ -357,10 +397,16 @@ public class HomeScreen implements Initializable {
             popStage.setScene(new Scene(root));
             popStage.show();
         }
+
+        long endTime = System.nanoTime();
+        double timeToSort = ((endTime - startTime)/1000.0);
+        System.out.println("Add company: " + timeToSort + "µs");
+
     }
 
     @FXML
     void dropCompanyFromGroup(ActionEvent e) throws SQLException {
+        long startTime = System.nanoTime();
         HBox selection = frontView.getSelectionModel().getSelectedItems().get(0);
         if(selection.getChildren().size() > 1){
             Text grpName = (Text) selection.getChildren().get(0);
@@ -368,10 +414,15 @@ public class HomeScreen implements Initializable {
             new DataHandler<>().executeUpdate(query);
             showGroups(e);
         }
+        long endTime = System.nanoTime();
+        double timeToSort = ((endTime - startTime)/1000.0);
+        System.out.println("Drop company: " + timeToSort + "µs");
     }
 
     @FXML
     void dropGroup(ActionEvent e) throws SQLException {
+        long startTime = System.nanoTime();
+
         HBox selection = frontView.getSelectionModel().getSelectedItems().get(0);
         if(selection.getChildren().size() == 1){
             Text grpName = (Text) selection.getChildren().get(0);
@@ -379,6 +430,11 @@ public class HomeScreen implements Initializable {
             new DataHandler<>().executeUpdate(query);
             showGroups(e);
         }
+
+        long endTime = System.nanoTime();
+        double timeToSort = ((endTime - startTime)/1000.0);
+        System.out.println("Drop group: " + timeToSort + "µs");
+
     }
 
     @FXML
@@ -399,14 +455,18 @@ public class HomeScreen implements Initializable {
         stage.show();
     }
 
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        long startTime = System.nanoTime();
         PrefSettings p = new PrefReader();
         user = new User(p.readValues().get(1),p.readValues().get(0),p.readValues().get(2));
         heading.setText("Hi, " + user.name());
         //System.out.println(user.toString());
         showTransactions(new ActionEvent());
         focus = FocusModes.TRANSACTION;
+        long endTime = System.nanoTime();
+        double timeToSort = ((endTime - startTime)/1000.0);
+        System.out.println("Startup time: " + timeToSort + "µs");
+
     }
 }

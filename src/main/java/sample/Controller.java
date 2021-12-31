@@ -41,11 +41,7 @@ public class Controller implements Initializable {
 
     @FXML
     void loginButton(ActionEvent e) throws SQLException {
-        /*try{
-            System.out.println(DataProcess.getStockPrice("GOOGL"));
-        } catch (IOException ex){
-            ex.printStackTrace();
-        }*/
+
         DataHandler<ActionEvent> dataHandler = new DataHandler<>();
         String query = "SELECT * FROM User WHERE email_ID = '" + userNameBox.getValue() + "';";
         dataHandler.executeQuery(query,e,(resultSet, actionEvent)->{
