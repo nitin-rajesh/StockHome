@@ -21,7 +21,7 @@
    <children>
       <AnchorPane prefHeight="240.0" prefWidth="380.0">
          <children>
-            <Text layoutX="74.0" layoutY="87.0" strokeType="OUTSIDE" strokeWidth="0.0" text="StockHome" AnchorPane.bottomAnchor="162.1484375" AnchorPane.leftAnchor="74.0" AnchorPane.rightAnchor="74.90625" AnchorPane.topAnchor="41.9765625">
+            <Text fx:id="headingText" layoutX="74.0" layoutY="87.0" strokeType="OUTSIDE" strokeWidth="0.0" text="StockHome" AnchorPane.bottomAnchor="162.1484375" AnchorPane.leftAnchor="74.0" AnchorPane.rightAnchor="74.90625" AnchorPane.topAnchor="41.9765625">
                <font>
                   <Font name="DIN Alternate Bold" size="48.0" />
                </font>

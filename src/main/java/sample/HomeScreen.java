@@ -17,6 +17,7 @@ import sample.DatabaseConnection.Base.DataHandler;
 import sample.DatabaseConnection.Base.DataProcess;
 import sample.DatabaseConnection.Mongo.MongoHandler;
 import sample.DatabaseConnection.Mongo.MongoProcess;
+import sample.DatabaseConnection.PrefStack.ModeSetter;
 import sample.DatabaseConnection.PrefStack.PrefReader;
 import sample.DatabaseConnection.PrefStack.PrefSettings;
 import sample.DatabaseConnection.PrefStack.PrefWriter;
@@ -27,6 +28,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -56,6 +58,7 @@ public class HomeScreen implements Initializable {
     TextField searchBar;
 
     FocusModes focus;
+    private DataHandler<String> stockHome;
 
     @FXML
     void searchStock(ActionEvent event){
@@ -66,7 +69,7 @@ public class HomeScreen implements Initializable {
         System.out.println("Here");
         String searchKey = searchBar.getText();
         String query = "Select * from Company where Trade_name='" + searchKey + "' or Name like '%" + searchKey + "%';";
-        DataHandler<Integer> dataHandler = new DataHandler<>();
+        DataHandler<Integer> dataHandler = new DataHandler<>(ModeSetter.getMode());
         frontView.getItems().clear();
         dataHandler.executeQuery(query, search,(rc, count)->{
             while(rc.next() && count < 80){
@@ -87,7 +90,14 @@ public class HomeScreen implements Initializable {
                     long sTime = System.nanoTime();
 
                     try {
-                        double marketPrice = DataProcess.getStockPrice(coSymbol.getText());
+                        String searchWord;
+                        if(ModeSetter.getMode().equals("StockHome")){
+                            searchWord = coSymbol.getText();
+                        }
+                        else{
+                            searchWord = coName.getText().replace(" ","-").toLowerCase(Locale.ROOT);
+                        }
+                        double marketPrice = DataProcess.getStockPrice(searchWord, ModeSetter.getMode().concat("_scraper.py"));
                         coPrice.setText(new DecimalFormat("#.##").format(marketPrice));
 
                     } catch (IOException | InterruptedException ioException) {
@@ -104,12 +114,21 @@ public class HomeScreen implements Initializable {
                     alert.setContentText("Are you sure you want to proceed?");
                     Optional<ButtonType> result = alert.showAndWait();
                     if(result.get() == ButtonType.OK) {
+
+
+                        String searchWord;
+                        if(ModeSetter.getMode().equals("StockHome")){
+                            searchWord = coSymbol.getText();
+                        }
+                        else{
+                            searchWord = coName.getText().replace(" ","-").toLowerCase(Locale.ROOT);
+                        }
                         String q = "INSERT INTO TRANSACTION(Price,Quantity,Txn_TradeName,Txn_UserID,Buy_or_sell) VALUES"
                                 + "(" + Double.parseDouble(coPrice.getText()) + ", " + Integer.parseInt(quantity.getText())
-                                + ", '" + coSymbol.getText() + "', '" + user.emailID() + "', 'b');";
+                                + ", '" + searchWord+ "', '" + user.emailID() + "', 'b');";
                         System.out.println(q);
                         try {
-                            new DataHandler<String>().executeUpdate(q);
+                            new DataHandler<String>(ModeSetter.getMode()).executeUpdate(q);
                         } catch (SQLException throwables) {
                             throwables.printStackTrace();
                         }
@@ -141,7 +160,7 @@ public class HomeScreen implements Initializable {
         frontView.getItems().clear();
         for(String sym: symbols){
         String query = "Select * from Company where Trade_name='" + sym +"';";
-        DataHandler<Integer> dataHandler = new DataHandler<>();
+        DataHandler<Integer> dataHandler = new DataHandler<>(ModeSetter.getMode());
 
         dataHandler.executeQuery(query, search,(rc, count)->{
             while(rc.next() && count < 20){
@@ -160,7 +179,14 @@ public class HomeScreen implements Initializable {
                 buttonRepo.add(buyButton);
                 new Thread(()->{
                     try {
-                        double marketPrice = DataProcess.getStockPrice(coSymbol.getText());
+                        String searchWord;
+                        if(ModeSetter.getMode().equals("StockHome")){
+                            searchWord = coSymbol.getText();
+                        }
+                        else{
+                            searchWord = coName.getText().replace(" ","-").toLowerCase(Locale.ROOT);
+                        }
+                        double marketPrice = DataProcess.getStockPrice(searchWord, ModeSetter.getMode().concat("_scraper.py"));
                         coPrice.setText(new DecimalFormat("#.##").format(marketPrice));
 
                     } catch (IOException | InterruptedException ioException) {
@@ -173,12 +199,20 @@ public class HomeScreen implements Initializable {
                     alert.setContentText("Are you sure you want to proceed?");
                     Optional<ButtonType> result = alert.showAndWait();
                     if(result.get() == ButtonType.OK) {
+
+                        String searchWord;
+                        if(ModeSetter.getMode().equals("StockHome")){
+                            searchWord = coSymbol.getText();
+                        }
+                        else{
+                            searchWord = coName.getText().replace(" ","-").toLowerCase(Locale.ROOT);
+                        }
                         String q = "INSERT INTO TRANSACTION(Price,Quantity,Txn_TradeName,Txn_UserID,Buy_or_sell) VALUES"
                                 + "(" + Double.parseDouble(coPrice.getText()) + ", " + Integer.parseInt(quantity.getText())
-                                + ", '" + coSymbol.getText() + "', '" + user.emailID() + "', 'b');";
+                                + ", '" + searchWord + "', '" + user.emailID() + "', 'b');";
                         System.out.println(q);
                         try {
-                            new DataHandler<String>().executeUpdate(q);
+                            new DataHandler<String>(ModeSetter.getMode()).executeUpdate(q);
                         } catch (SQLException throwables) {
                             throwables.printStackTrace();
                         }
@@ -204,7 +238,7 @@ public class HomeScreen implements Initializable {
         long startTime = System.nanoTime();
 
         focus = FocusModes.TRANSACTION;
-        DataHandler<String> dataHandler = new DataHandler<>();
+        DataHandler<String> dataHandler = new DataHandler<>(ModeSetter.getMode());
         String query = "SELECT * FROM Transaction WHERE Txn_userID = '" + user.emailID() + "';";
         frontView.getItems().clear();
         dataHandler.executeQuery(query, query, (rc, ignored)->{
@@ -230,7 +264,8 @@ public class HomeScreen implements Initializable {
                 transactionIDs.add(tID);
                 new Thread(()->{
                     try {
-                        double marketPrice = DataProcess.getStockPrice(coName.getText());
+
+                        double marketPrice = DataProcess.getStockPrice(coName.getText(), ModeSetter.getMode().concat("_scraper.py"));
                         updatedPrice.setText("Market price: " + new DecimalFormat(".##").format(marketPrice));
                         double roiVal = 100*(marketPrice - Double.parseDouble(coPrice.getText()))/Double.parseDouble(coPrice.getText());
                         String opString = new DecimalFormat("#.##").format(roiVal) + "%";
@@ -259,7 +294,7 @@ public class HomeScreen implements Initializable {
                             + ", '" + coName.getText()+"', '" + user.emailID() + "', 's');";
                     System.out.println(sellQuery);
                     try {
-                        new DataHandler<String>().executeUpdate(sellQuery);
+                        new DataHandler<String>(ModeSetter.getMode()).executeUpdate(sellQuery);
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
                     }
@@ -267,7 +302,7 @@ public class HomeScreen implements Initializable {
                     String dropQuery = "DELETE FROM TRANSACTION WHERE Transaction_ID = " + tID + ";";
                     System.out.println(dropQuery);
                     try {
-                        new DataHandler<String>().executeUpdate(dropQuery);
+                        new DataHandler<String>(ModeSetter.getMode()).executeUpdate(dropQuery);
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
                     }
@@ -304,7 +339,7 @@ public class HomeScreen implements Initializable {
         long startTime = System.nanoTime();
 
         focus = FocusModes.GROUP;
-        DataHandler<String> dataHandler = new DataHandler<>();
+        DataHandler<String> dataHandler = new DataHandler<>(ModeSetter.getMode());
         String query = "SELECT * FROM StockGroup WHERE Group_userID = '" + user.emailID() + "';";
         frontView.getItems().clear();
         dataHandler.executeQuery(query, query, (rc, ignored)->{
@@ -316,11 +351,11 @@ public class HomeScreen implements Initializable {
                 //grpBar.getItems().add(groupName);
                 temp.getChildren().add(groupName);
                 String q = "SELECT * FROM GroupItem WHERE Item_grpID = " + rc.getString("Group_ID") +";";
-                new DataHandler<String>().executeQuery(q,null,(grpRC,grpIgnore) -> {
+                new DataHandler<String>(ModeSetter.getMode()).executeQuery(q,null,(grpRC,grpIgnore) -> {
                     while (grpRC.next()){
                         String qc = "SELECT * FROM Company WHERE Trade_name = '" + grpRC.getString("Item_TradeName") +"';";
                         System.out.println(qc);
-                        new DataHandler<String>().executeQuery(qc,null,(cmpRC,cmpIgnored) -> {
+                        new DataHandler<String>(ModeSetter.getMode()).executeQuery(qc,null,(cmpRC,cmpIgnored) -> {
                             int count = 0;
                             while(cmpRC.next() && count < 20){
                                 count++;
@@ -338,7 +373,14 @@ public class HomeScreen implements Initializable {
                                 buttonRepo.add(buyButton);
                                 new Thread(()->{
                                     try {
-                                        double marketPrice = DataProcess.getStockPrice(coSymbol.getText());
+                                        String searchWord;
+                                        if(ModeSetter.getMode().equals("StockHome")){
+                                            searchWord = coSymbol.getText();
+                                        }
+                                        else{
+                                            searchWord = coName.getText().replace(" ","-").toLowerCase(Locale.ROOT);
+                                        }
+                                        double marketPrice = DataProcess.getStockPrice(searchWord, ModeSetter.getMode().concat("_scraper.py"));
                                         coPrice.setText(new DecimalFormat("#.##").format(marketPrice));
 
                                     } catch (IOException | InterruptedException ioException) {
@@ -389,7 +431,7 @@ public class HomeScreen implements Initializable {
             String query = "INSERT INTO GroupItem (Item_grpID,Item_tradeName) VALUES (1,'"
                     + obj.getText() + "');";
             System.out.println(query);
-            new DataHandler<String>().executeUpdate(query);
+            new DataHandler<String>(ModeSetter.getMode()).executeUpdate(query);
             Stage popStage = new Stage();
 
             Parent root = FXMLLoader.load(getClass().getResource("/dialogue_box.fxml"));
@@ -411,7 +453,7 @@ public class HomeScreen implements Initializable {
         if(selection.getChildren().size() > 1){
             Text grpName = (Text) selection.getChildren().get(0);
             String query = "DELETE from GroupItem WHERE Item_TradeName = '" + grpName.getText() +"';";
-            new DataHandler<>().executeUpdate(query);
+            new DataHandler<>(ModeSetter.getMode()).executeUpdate(query);
             showGroups(e);
         }
         long endTime = System.nanoTime();
@@ -427,7 +469,7 @@ public class HomeScreen implements Initializable {
         if(selection.getChildren().size() == 1){
             Text grpName = (Text) selection.getChildren().get(0);
             String query = "DELETE from StockGroup WHERE Group_name = '" + grpName.getText() +"';";
-            new DataHandler<>().executeUpdate(query);
+            new DataHandler<>(ModeSetter.getMode()).executeUpdate(query);
             showGroups(e);
         }
 
@@ -450,7 +492,7 @@ public class HomeScreen implements Initializable {
         new PrefWriter().writeValues(" "," "," ");
         stage = (Stage) (menuBar).getScene().getWindow();
         Parent root = FXMLLoader.load(getClass().getResource("/login.fxml"));
-        stage.setTitle("StockHome login");
+        stage.setTitle("Login");
         stage.setScene(new Scene(root));
         stage.show();
     }

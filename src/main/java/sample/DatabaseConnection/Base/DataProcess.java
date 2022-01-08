@@ -2,6 +2,7 @@ package sample.DatabaseConnection.Base;
 
 import javafx.scene.control.ComboBox;
 import sample.DatabaseConnection.Base.DataHandler;
+import sample.DatabaseConnection.PrefStack.ModeSetter;
 import sample.DatabaseConnection.Records.*;
 
 
@@ -12,7 +13,7 @@ import java.io.InputStreamReader;
 import java.sql.SQLException;
 
 public class DataProcess {
-    static DataHandler dataHandler = new DataHandler();
+    static DataHandler dataHandler = new DataHandler(ModeSetter.getMode());
     public static void addUser(User user) throws SQLException {
         String query = "INSERT INTO User(Username, password, email_id) VALUES (";
         String fullquery = query.concat("'" + user.name() + "','" + user.password() + "','" + user.emailID() + "');");
@@ -20,9 +21,9 @@ public class DataProcess {
         dataHandler.executeUpdate(fullquery);
     }
 
-    public static double getStockPrice(String symbol) throws IOException, InterruptedException {
+    public static double getStockPrice(String symbol, String file) throws IOException, InterruptedException {
         Runtime rt = Runtime.getRuntime();
-        String[] commands = {"python3", "stock_scraper.py",symbol};
+        String[] commands = {"python3", file,symbol};
         Process proc = rt.exec(commands);
         proc.waitFor();
         BufferedReader stdInput = new BufferedReader(new

@@ -14,6 +14,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import sample.DatabaseConnection.Base.DataHandler;
 import sample.DatabaseConnection.Base.DataProcess;
+import sample.DatabaseConnection.PrefStack.ModeSetter;
 import sample.DatabaseConnection.PrefStack.PrefSettings;
 import sample.DatabaseConnection.PrefStack.PrefWriter;
 import sample.DatabaseConnection.Records.User;
@@ -40,9 +41,12 @@ public class Controller implements Initializable {
     Text infoText;
 
     @FXML
+    Text headingText;
+
+    @FXML
     void loginButton(ActionEvent e) throws SQLException {
 
-        DataHandler<ActionEvent> dataHandler = new DataHandler<>();
+        DataHandler<ActionEvent> dataHandler = new DataHandler<>(ModeSetter.getMode());
         String query = "SELECT * FROM User WHERE email_ID = '" + userNameBox.getValue() + "';";
         dataHandler.executeQuery(query,e,(resultSet, actionEvent)->{
             while(resultSet.next()){
@@ -53,7 +57,7 @@ public class Controller implements Initializable {
                     p.writeValues(user.name(),user.emailID(),user.password());
                     try{
                         Parent root = FXMLLoader.load(getClass().getResource("/home_screen.fxml"));
-                        stage.setTitle("StockHome - " + resultSet.getString("Username"));
+                        stage.setTitle(ModeSetter.getMode() + " - " + resultSet.getString("Username"));
                         stage.setScene(new Scene(root));
                         stage.show();
                     }catch (IOException ignored){}
@@ -75,10 +79,9 @@ public class Controller implements Initializable {
         stage.show();
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-
-        DataHandler<ComboBox<String>> dataHandler = new DataHandler<>();
+    public void refreshUsernames(){
+        userNameBox.getItems().clear();
+        DataHandler<ComboBox<String>> dataHandler = new DataHandler<>(ModeSetter.getMode());
         String query = "SELECT Email_ID from User";
         dataHandler.executeQuery(query, userNameBox, (rc,userNameBox)->{
             ArrayList<String> emailIDs = new ArrayList<>();
@@ -89,6 +92,12 @@ public class Controller implements Initializable {
                 userNameBox.getItems().add(email);
             }
         });
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        headingText.setText(ModeSetter.getMode());
+        refreshUsernames();
 
     }
 }
