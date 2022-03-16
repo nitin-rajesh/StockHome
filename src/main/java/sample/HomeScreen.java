@@ -7,6 +7,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -27,10 +30,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HomeScreen implements Initializable {
@@ -241,6 +241,10 @@ public class HomeScreen implements Initializable {
         DataHandler<String> dataHandler = new DataHandler<>(ModeSetter.getMode());
         String query = "SELECT * FROM Transaction WHERE Txn_userID = '" + user.emailID() + "';";
         frontView.getItems().clear();
+        try{
+            MongoProcess.clearDB();
+        }catch (IOException ignored){}
+
         dataHandler.executeQuery(query, query, (rc, ignored)->{
             while(rc.next()){
                 AtomicBoolean toSell = new AtomicBoolean(false);
@@ -491,9 +495,33 @@ public class HomeScreen implements Initializable {
         transactionIDs.clear();
         new PrefWriter().writeValues(" "," "," ");
         stage = (Stage) (menuBar).getScene().getWindow();
-        Parent root = FXMLLoader.load(getClass().getResource("/login.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/login.fxml"));
+        Parent root = loader.load();
         stage.setTitle("Login");
-        stage.setScene(new Scene(root));
+        Scene scene = new Scene(root);
+        scene.addEventFilter(KeyEvent.KEY_PRESSED,(KeyEvent event)->{
+            //System.out.println(event.getText());
+            if(event.isAltDown() && event.isShiftDown()){
+                if(event.getCode().toString().equals("ENTER")){
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Forbidden treasure unlocked");
+                    alert.setContentText("Do you want to switch modes?");
+                    Image image = new Image(Objects.requireNonNull(getClass().getResource("/f5c.jpg")).toExternalForm());
+                    ImageView imageView = new ImageView(image);
+                    imageView.setFitHeight(80);
+                    imageView.setFitWidth(65);
+                    alert.setGraphic(imageView);
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if(result.get() == ButtonType.OK)
+                        ModeSetter.switchMode();
+                    Controller temp = loader.getController();
+                    temp.headingText.setText(ModeSetter.getMode());
+                    temp.refreshUsernames();
+                    ModeSetter.getMode();
+                }
+            }
+        });
+        stage.setScene(scene);
         stage.show();
     }
 

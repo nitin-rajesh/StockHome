@@ -1,7 +1,5 @@
 package sample;
 
-import com.mongodb.DB;
-import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
 import javafx.application.Application;

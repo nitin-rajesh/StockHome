@@ -1,11 +1,14 @@
 package sample.DatabaseConnection.Mongo;
 
-import com.mongodb.MongoClient;
-import com.mongodb.client.*;
+import org.bson.BsonDocument;
+import org.bson.BsonInt64;
 import org.bson.Document;
-import sample.DatabaseConnection.Base.DataProcess;
-import sample.DatabaseConnection.Records.User;
-
+import org.bson.conversions.Bson;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoException;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
 import javax.print.Doc;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,14 +16,22 @@ import java.util.Iterator;
 import java.util.List;
 
 public class MongoHandler {
-    MongoClient client = new MongoClient("192.168.0.118",27017);
+    String connectionString = "mongodb://jarGuest:stockhome@Nitins-MacBook-Pro.local:27017/?maxPoolSize=20&w=majority";
+    MongoClient client;
     MongoDatabase database;
-    MongoCollection<Document> buyableCollection;
-    MongoCollection<Document> sellableCollection;
 
     public MongoHandler(){
-        database = client.getDatabase("recommendations");
+        client = MongoClients.create(connectionString);
+        try{
+            Bson command = new BsonDocument("ping",new BsonInt64(1));
+            Document commandResult = database.runCommand(command);
+            System.out.println("Connected successfully");
+        } catch (MongoException me){
+            System.err.println("Error occurred");
+        }
+
     }
+    /*
 
     public void addRec(String companySymbol, String email, String change, boolean toSell) throws IOException, InterruptedException {
         System.out.println("In addRec()");
@@ -56,7 +67,7 @@ public class MongoHandler {
         database.getCollection(user.emailID()).drop();
         System.out.println("Table dropped");
     }
-
+    */
 
 
 }
