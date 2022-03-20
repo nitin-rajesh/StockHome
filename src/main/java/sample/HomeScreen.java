@@ -45,6 +45,8 @@ public class HomeScreen implements Initializable {
 
     Stage stage;
 
+    Stage sellStage;
+
     @FXML
     Text heading;
 
@@ -72,7 +74,7 @@ public class HomeScreen implements Initializable {
         DataHandler<Integer> dataHandler = new DataHandler<>(ModeSetter.getMode());
         frontView.getItems().clear();
         dataHandler.executeQuery(query, search,(rc, count)->{
-            while(rc.next() && count < 80){
+            while(rc.next() && count < 40){
                 count++;
                 HBox temp = new HBox();
                 temp.setSpacing(20);
@@ -252,7 +254,7 @@ public class HomeScreen implements Initializable {
                 Integer tID = rc.getInt("Transaction_ID");
                 Text coPrice = new Text(new DecimalFormat("#.##").format(rc.getDouble("Price")));
                 Text coQuantity = new Text("x"+rc.getString("Quantity"));
-                Text currentPrice = new Text("Net: " + rc.getDouble("Price")*rc.getDouble("Quantity"));
+                Text currentPrice = new Text("Net: " + new DecimalFormat("#.##").format(rc.getDouble("Price")*rc.getDouble("Quantity")));
                 Text updatedPrice = new Text("...");
                 Text ROI = new Text(" ");
                 Text coName = new Text(rc.getString("Txn_TradeName"));
@@ -293,6 +295,29 @@ public class HomeScreen implements Initializable {
                 }).start();
 
                 sellButton.setOnAction(actionEvent -> {
+                    /*
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/sell_screen.fxml"));
+                    sellStage = new Stage();
+                    try {
+                        Parent root = loader.load();
+                        sellStage.setScene(new Scene(root));
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    Text titleText = (Text)loader.getNamespace().get("titleText");
+                    titleText.setText(coName.getText());
+                    Text stocksOwned = (Text)loader.getNamespace().get("stocksOwned");
+                    stocksOwned.setText("/"+coQuantity.getText().substring(1));
+                    Text stockPrice = (Text)loader.getNamespace().get("stockPrice");
+                    stockPrice.setText(updatedPrice.getText().substring("Market price: ".length()));
+                    Text tid = (Text)loader.getNamespace().get("tID");
+                    tid.setText(tID.toString());
+
+                    sellStage.showAndWait();
+                    showTransactions(e);
+                    */
+
                     String sellQuery = "INSERT INTO TRANSACTION(Price,Quantity,Txn_TradeName,Txn_UserID,Buy_or_sell) VALUES"
                             + "(" + Double.parseDouble(updatedPrice.getText().substring("Market price: ".length())) + ", " + Integer.parseInt(coQuantity.getText().substring(1))
                             + ", '" + coName.getText()+"', '" + user.emailID() + "', 's');";
@@ -311,6 +336,8 @@ public class HomeScreen implements Initializable {
                         throwables.printStackTrace();
                     }
                     showTransactions(e);
+
+
                 });
 
                 if(rc.getString("Buy_or_sell").equals("b")){

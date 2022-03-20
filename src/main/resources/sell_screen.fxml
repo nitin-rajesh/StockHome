@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="163.0" prefWidth="311.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.SellScreen">
+   <children>
+      <Text fx:id="titleText" layoutX="34.0" layoutY="47.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sell stocks">
+         <font>
+            <Font name="DIN Alternate Bold" size="25.0" />
+         </font>
+      </Text>
+      <TextField fx:id="stocksToSell" layoutX="35.0" layoutY="59.0" prefHeight="26.0" prefWidth="155.0" />
+      <Text fx:id="stocksOwned" layoutX="198.0" layoutY="78.0" strokeType="OUTSIDE" strokeWidth="0.0" text="/0">
+         <font>
+            <Font name="Monaco" size="16.0" />
+         </font>
+      </Text>
+      <Button defaultButton="true" layoutX="237.0" layoutY="127.0" mnemonicParsing="false" onAction="#sellStocks" prefHeight="26.0" prefWidth="50.0" text="Sell" />
+      <Button cancelButton="true" layoutX="170.0" layoutY="127.0" mnemonicParsing="false" onAction="#cancel" prefHeight="26.0" prefWidth="57.0" text="Cancel" />
+      <HBox layoutX="35.0" layoutY="93.0" prefHeight="30.0" prefWidth="249.0">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="x" wrappingWidth="18.4013671875">
+               <font>
+                  <Font name="Monaco" size="14.0" />
+               </font>
+            </Text>
+            <Text fx:id="stockPrice" strokeType="OUTSIDE" strokeWidth="0.0" text="0.00">
+               <font>
+                  <Font name="Monaco" size="14.0" />
+               </font>
+            </Text>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="=" textAlignment="CENTER" wrappingWidth="27.4013671875">
+               <font>
+                  <Font name="Monaco" size="14.0" />
+               </font>
+            </Text>
+            <Text fx:id="netPrice" strokeType="OUTSIDE" strokeWidth="0.0" text="0.00" underline="true" wrappingWidth="177.408203125">
+               <font>
+                  <Font name="Monaco" size="14.0" />
+               </font>
+            </Text>
+         </children>
+      </HBox>
+      <Text fx:id="tID" fill="TRANSPARENT" layoutX="14.0" layoutY="145.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+   </children>
+</AnchorPane>
